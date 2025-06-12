@@ -70,9 +70,9 @@ export default function EditBlogPage() {
       const response: APIResponse<BlogData> = await api.getBlog(id)
       
       if (response.success && response.data) {
-        const blog = response.data as BlogData
+        const blog = response.data
         setFormData({
-          title: blog.title || '',
+          title: (blog as BlogData).title || '',
           content: blog.content || '',
           excerpt: blog.excerpt || '',
           featuredImage: blog.featured_image || '',
