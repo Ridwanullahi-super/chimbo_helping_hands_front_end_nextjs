@@ -44,7 +44,7 @@ class ApiClient {
     };
 
     if (this.token) {
-      headers.Authorization = `Bearer ${this.token}`;
+      (headers as Record<string, string>).Authorization = `Bearer ${this.token}`;
     }
 
     try {
@@ -264,8 +264,8 @@ class ApiClient {
       }),
     });
 
-    if (response.success && response.data?.token) {
-      this.setToken(response.data.token);
+    if (response.success && (response.data as { token: string })?.token) {
+      this.setToken((response.data as { token: string }).token);
     }
 
     return response;
@@ -277,8 +277,8 @@ class ApiClient {
       body: JSON.stringify(credentials),
     });
 
-    if (response.success && response.data?.token) {
-      this.setToken(response.data.token);
+    if (response.success && (response.data as { token: string })?.token) {
+      this.setToken((response.data as { token: string }).token);
     }
 
     return response;

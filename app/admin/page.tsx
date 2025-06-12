@@ -69,8 +69,9 @@ export default function AdminPage() {
       const response = await api.getDashboardStats()
       
       if (response.success && response.data) {
-        setDashboardStats(response.data.overview)
-        setRecentDonations(response.data.recentDonations || [])
+        const data = response.data as { overview: DashboardStats; recentDonations: RecentDonation[] }
+        setDashboardStats(data.overview)
+        setRecentDonations(data.recentDonations || [])
       }
     } catch (error) {
       console.error('Failed to load dashboard data:', error)
