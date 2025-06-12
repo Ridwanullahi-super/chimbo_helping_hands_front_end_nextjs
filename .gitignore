@@ -40,4 +40,4 @@
 # Ignore temporary files
 /tmp    
 .next
-# Ignore coverage reports
+# Ignore coverage reports.next/
