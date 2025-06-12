@@ -69,15 +69,22 @@ export default function AdminPage() {
     try {
       setIsLoadingStats(true);
       const response = await api.getDashboardStats();
+        if (
+      response.success &&
+      response.data &&
+      typeof response.data === 'object' &&
+      'overview' in response.data &&
+      'recentDonations' in response.data
+      ) {
+      const data = response.data as {
+        overview: DashboardStats;
+        recentDonations: RecentDonation[];
+      };
 
-      if (response.success && response.data) {
-        const data = response.data as {
-          overview: DashboardStats;
-          recentDonations: RecentDonation[];
-        };
-        setDashboardStats(data.overview);
-        setRecentDonations(data.recentDonations || []);
+      setDashboardStats(data.overview);
+      setRecentDonations(data.recentDonations || []);
       }
+
     } catch (error) {
       console.error("Failed to load dashboard data:", error);
       toast.error("Failed to load dashboard data");
