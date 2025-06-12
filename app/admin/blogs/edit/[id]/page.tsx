@@ -7,6 +7,7 @@ import { ArrowLeft, Save, Eye, Image, Tag, FileText } from 'lucide-react'
 import { useAuth } from '../../../../context/AuthContext'
 import { api } from '../../../../lib/api'
 import toast from 'react-hot-toast'
+import axios from 'axios'
 
 interface BlogData {
   id: number
@@ -19,19 +20,35 @@ interface BlogData {
   meta_description: string
 }
 
+interface FormData {
+  title: string
+  content: string
+  excerpt: string
+  featuredImage: string
+  tags: string
+  status: 'draft' | 'published'
+  metaDescription: string
+}
+
+interface APIResponse<T> {
+  success: boolean
+  data?: T
+  message?: string
+}
+
 export default function EditBlogPage() {
   const { user, isAdmin, loading } = useAuth()
   const router = useRouter()
   const params = useParams()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     title: '',
     content: '',
     excerpt: '',
     featuredImage: '',
     tags: '',
-    status: 'draft' as 'draft' | 'published',
+    status: 'draft',
     metaDescription: ''
   })
 
@@ -50,8 +67,7 @@ export default function EditBlogPage() {
   const loadBlog = async (id: string) => {
     try {
       setIsLoading(true)
-      // Note: You'll need to implement getBlogById in your API
-      const response = await api.getBlog(id)
+      const response: APIResponse<BlogData> = await api.getBlog(id)
       
       if (response.success && response.data) {
         const blog = response.data as BlogData
@@ -93,15 +109,17 @@ export default function EditBlogPage() {
         .map(tag => tag.trim())
         .filter(tag => tag.length > 0)
 
-      const response = await api.updateBlog(parseInt(params.id as string), {
+      const updateData: Partial<BlogData> = {
         title: formData.title,
         content: formData.content,
         excerpt: formData.excerpt || undefined,
-        featuredImage: formData.featuredImage || undefined,
+        featured_image: formData.featuredImage || undefined,
         tags: tagsArray.length > 0 ? tagsArray : undefined,
         status: formData.status,
-        metaDescription: formData.metaDescription || undefined
-      })
+        meta_description: formData.metaDescription || undefined
+      }
+
+      const response = await api.updateBlog(parseInt(params.id as string), updateData)
 
       if (response.success) {
         toast.success('Blog post updated successfully!')
@@ -129,6 +147,52 @@ export default function EditBlogPage() {
       </div>
     )
   }
+  // API base URL - you should store this in your environment variables
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api'
+
+ const api = {
+  getBlog: async (id: string): Promise<APIResponse<BlogData>> => {
+    try {
+      const response = await axios.get(`${API_URL}/blogs/${id}`)
+      return {
+        success: true,
+        data: response.data
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        return {
+          success: false,
+          message: error.response?.data?.message || 'Failed to fetch blog post'
+        }
+      }
+      return {
+        success: false,
+        message: 'An unexpected error occurred'
+      }
+    }
+  },
+
+  updateBlog: async (id: number, data: Partial<BlogData>): Promise<APIResponse<BlogData>> => {
+    try {
+      const response = await axios.put(`${API_URL}/blogs/${id}`, data)
+      return {
+        success: true,
+        data: response.data
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        return {
+          success: false,
+          message: error.response?.data?.message || 'Failed to update blog post'
+        }
+      }
+      return {
+        success: false,
+        message: 'An unexpected error occurred'
+      }
+    }
+  }
+}
 
   return (
     <div className="min-h-screen bg-gray-50 pt-16">
