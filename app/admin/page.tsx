@@ -52,7 +52,16 @@ export default function AdminPage() {
   );
   const [recentDonations, setRecentDonations] = useState<RecentDonation[]>([]);
   const [isLoadingStats, setIsLoadingStats] = useState(true);
-
+  function isDashboardData(
+    data: any
+  ): data is { overview: DashboardStats; recentDonations: RecentDonation[] } {
+    return (
+      data &&
+      typeof data === "object" &&
+      "overview" in data &&
+      "recentDonations" in data
+    );
+  }
   useEffect(() => {
     if (!loading && !isAdmin) {
       router.push("/");
@@ -68,23 +77,13 @@ export default function AdminPage() {
   const loadDashboardData = async () => {
     try {
       setIsLoadingStats(true);
+
       const response = await api.getDashboardStats();
-        if (
-      response.success &&
-      response.data &&
-      typeof response.data === 'object' &&
-      'overview' in response.data &&
-      'recentDonations' in response.data
-      ) {
-      const data = response.data as {
-        overview: DashboardStats;
-        recentDonations: RecentDonation[];
-      };
 
-      setDashboardStats(data.overview);
-      setRecentDonations(data.recentDonations || []);
+      if (response.success && isDashboardData(response.data)) {
+        setDashboardStats(response.data.overview);
+        setRecentDonations(response.data.recentDonations || []);
       }
-
     } catch (error) {
       console.error("Failed to load dashboard data:", error);
       toast.error("Failed to load dashboard data");
