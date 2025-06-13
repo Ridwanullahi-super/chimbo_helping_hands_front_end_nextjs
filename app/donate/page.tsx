@@ -141,6 +141,14 @@ export default function DonatePage() {
         icon: CreditCard,
         color: 'blue',
         available: true
+      },
+      {
+        id: 'flutterwave' as const,
+        name: 'Flutterwave',
+        description: 'Pay with your Flutterwave account or card',
+        icon: CreditCard,
+        color: 'blue',
+        available: true
       }
     ]
 
@@ -154,12 +162,12 @@ export default function DonatePage() {
 
     if (africanCountries.includes(country)) {
       methods.push({
-        id: 'flutterwave' as const,
-        name: 'Flutterwave',
-        description: 'African payment methods (Mobile Money, Bank Transfer)',
-        icon: CreditCard,
-        color: 'orange',
-        available: true
+      id: 'flutterwave' as const,
+      name: 'Flutterwave',
+      description: 'African payment methods (Mobile Money, Bank Transfer)',
+      icon: CreditCard,
+      color: 'orange',
+      available: true
       })
     }
 

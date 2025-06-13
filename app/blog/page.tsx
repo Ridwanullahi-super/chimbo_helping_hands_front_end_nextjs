@@ -36,8 +36,9 @@ export default function BlogPage() {
       const response = await api.getBlogs(currentPage, 9, searchTerm)
       
       if (response.success && response.data) {
-        setBlogs(response.data.blogs)
-        setTotalPages(response.data.pagination.totalPages)
+        const data = response.data as { blogs: Blog[]; pagination: { totalPages: number } }
+        setBlogs(data.blogs)
+        setTotalPages(data.pagination.totalPages)
       }
     } catch (error) {
       console.error('Failed to load blogs:', error)
@@ -63,7 +64,7 @@ export default function BlogPage() {
 
   const getAllTags = () => {
     const allTags = blogs.flatMap(blog => blog.tags || [])
-    return [...new Set(allTags)]
+    return Array.from(new Set(allTags))
   }
 
   const filteredBlogs = selectedTag 

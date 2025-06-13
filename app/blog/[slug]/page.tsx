@@ -43,8 +43,9 @@ export default function BlogPostPage() {
       const response = await api.getBlog(slug)
       
       if (response.success && response.data) {
-        setBlog(response.data)
-        loadRelatedBlogs(response.data.tags)
+        const blogData = response.data as BlogPost
+        setBlog(blogData)
+        loadRelatedBlogs(blogData.tags)
       } else {
         toast.error('Blog post not found')
       }
@@ -60,7 +61,8 @@ export default function BlogPostPage() {
     try {
       const response = await api.getBlogs(1, 3)
       if (response.success && response.data) {
-        setRelatedBlogs(response.data.blogs.slice(0, 3))
+        const data = response.data as { blogs: any[] }
+        setRelatedBlogs(data.blogs.slice(0, 3))
       }
     } catch (error) {
       console.error('Failed to load related blogs:', error)

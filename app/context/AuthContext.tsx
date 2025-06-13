@@ -62,7 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const response = await api.getCurrentUser()
       if (response.success && response.data) {
-        setUser(response.data)
+        setUser(response.data as User)
       } else {
         // Invalid token, remove it
         localStorage.removeItem('auth_token')
@@ -83,7 +83,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const response = await api.login({ email, password })
       
       if (response.success && response.data) {
-        setUser(response.data.user)
+        const userData = response.data as { user: User }
+        setUser(userData.user)
         toast.success('Login successful!')
         return true
       } else {
@@ -105,7 +106,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const response = await api.register(userData)
       
       if (response.success && response.data) {
-        setUser(response.data.user)
+        setUser((response.data as { user: User }).user)
         toast.success('Registration successful!')
         return true
       } else {
